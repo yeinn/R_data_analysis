@@ -1,0 +1,96 @@
+
+# 기본 폴더 준비
+setwd("C://Users//Administrator//Desktop//rtest")
+
+
+# 분석 데이터 불러오기
+#data<-readLines("review.txt")
+#data<-readLines("sijang.txt")    
+
+#텍스트 마이닝 실행 패키지 설치
+
+install.packages("rJava")
+install.packages("KoNLP")
+install.packages("stringr")
+install.packages("wordcloud")
+install.packages("RColorBrewer")
+install.packages('arules')
+install.packages('igraph')
+install.packages('combinat')
+
+library(rJava)
+library(KoNLP)
+library(stringr)
+library(wordcloud)
+library(RColorBrewer)
+library(arules)
+library(igraph)
+library(combinat)
+
+
+# 세종 한글 사전 시스템에 설치(명사)
+useSejongDic()
+
+# 세종 한글 사전 외 단어를 사전에 추가
+mergeUserDic(data.frame("좋아요","ncn"))
+mergeUserDic(data.frame("스티커","ncn")) 
+
+# 불용어 처리
+data<-gsub("안녕" ,"",data)
+data<-gsub("저희" ,"",data)
+
+# 단어 추출
+data_tran<-Map(extractNoun, data)
+data_tran<-unique(data_tran)
+data_tran<-sapply(data_tran,unique)
+
+
+# Filter 함수를 이용해서 2~8글자 사이의 결과만 추출
+data_tran<-sapply(data_tran,function(x) {Filter(function(y) {nchar(y) <= 8 && nchar(y) > 1},x)})
+
+
+# 매트릭스 컬럼의 생성
+names(data_tran) <- paste("Tr", 1:length(data_tran), sep="")
+names(data_tran)
+
+# 키워드를 매트리스 형태로 변환
+data_wordtran <- as(data_tran, "transactions")
+data_wordtran
+
+
+# 신뢰도 지지도 산출
+data_ares <- apriori(data_wordtran, parameter=list(minlen=2,supp=0.01, conf=0.3, maxlen=2))
+inspect(data_ares)
+
+data_rules <- labels(data_ares, ruleSep=" ")
+data_rules <- sapply(data_rules, strsplit, " ",  USE.NAMES=F)
+data_rulemat <- do.call("rbind", data_rules)
+data_ruleg <- graph.edgelist(data_rulemat,directed=F)
+
+
+
+# 그래픽 창 띄우기 
+x11()
+
+# 연관 분석 시각화
+plot.igraph(data_ruleg,
+            vertex.label=V(data_ruleg)$name,
+            vertex.label.cex=1,
+            vertex.label.color="navy",
+            layout=layout.fruchterman.reingold.grid,
+            vertex.label.font=.010,
+            vertex.frame.color="darkgoldenrod1",
+            edge.color="grey",
+            vertex.color="darkgoldenrod1")
+
+
+# 키워드 중심성 산출
+data_closen <- closeness(data_ruleg)
+
+# 중심성 시각
+plot(data_closen, col="red",xaxt="n", lty="solid", type="b", xlab="단어", ylab="closeness")
+points(data_closen, pch=16, col="navy")
+axis(1, seq(1, length(data_closen)), V(data_ruleg)$name, cex=5)
+
+
+

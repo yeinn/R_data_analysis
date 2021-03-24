@@ -1,0 +1,82 @@
+# 기본 폴더 준비
+setwd("C://Users//Administrator//Desktop//rtest")
+
+# 분석 데이터 불러오기
+#data<-readLines("review.txt")
+#data<-readLines("sijang.txt")                
+#data<-readLines("report.txt")    
+
+#텍스트 마이닝 실행 패키지 설치
+install.packages("rJava")
+install.packages("KoNLP")
+install.packages("stringr")
+install.packages("wordcloud")
+install.packages("RColorBrewer")
+
+library(rJava)
+library(KoNLP)
+library(stringr)
+library(wordcloud)
+library(RColorBrewer)
+
+# 세종 한글 사전 시스템에 설치
+useSejongDic()
+
+# 세종 한글 사전 외 단어를 사전에 추가
+mergeUserDic(data.frame("좋아요","ncn"))
+mergeUserDic(data.frame("스티커","ncn")) 
+
+# 키워드(명사) 추출 
+word_data<-sapply(data,extractNoun,USE.NAMES = F)
+res_data<-unlist(word_data)
+head(res_data , 20 )
+
+# 불용어 제거
+res_data<- gsub("안녕","" , res_data)
+res_data<- gsub("저희","" , res_data)
+
+
+# Filter 함수를 이용해서 2~6글자 사이의 결과만 추출
+res_data<- Filter(function(x){nchar(x)>=2 & nchar(x)<=6 },res_data)
+write(unlist(res_data),"keylist_data.txt")
+keylist_data<-read.table("keylist_data.txt",header = FALSE,quote = "")
+
+
+# 키워드  빈도 계산
+tabkey_data<-table(keylist_data)
+
+# 키워드  빈도표 엑셀 파일(.csv)로 저장
+write.csv(tabkey_data,"keyf_data.csv")
+
+
+
+## 워드클라우드
+
+# 글자 색 지정
+palete<-brewer.pal(5,"Set1")
+
+# 그래픽 창 띄우기 
+x11()
+
+# 키워드 시각화
+wordcloud(names(tabkey_data),freq=tabkey_data, 
+          scale=c(5,1), rot.per = 0.5, min.freq =5, random.order = T,
+          random.color = T, colors = palete)
+
+
+## 토픽분석
+
+# 단어만
+topic_word<-head(sort(tabkey_data, decreasing=T), 20)
+pie(topic_word, col=palete, radius=1)
+
+# 단어와 %
+pct <- round(topic_word/sum(topic_word)*100, 1)
+names(topic_word)
+lab <- paste(names(topic_word), "\n", pct, "%")
+pie(topic_word, col=palete, cex=0.8, labels=lab)
+
+# 도넛 모양 원그래프 단어와 %
+par(new=T)
+pie(topic_word, radius=0.6, col="white", labels=NA, border=NA)
+

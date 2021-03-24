@@ -1,0 +1,130 @@
+###############################################################
+##                       분석 준비                           ##
+###############################################################
+
+
+#기본 폴더 준비
+setwd("C://Users//Desktop//rtest")
+
+# 분석 데이터 불러오기
+bg_data<-read.csv("data_society.csv") # 38 obs. // 25 Var.
+
+# 분석 데이터셋 확인
+head(bg_data)
+tail(bg_data)
+str(bg_data)
+summary(bg_data) # 음수 $한개, 결측값 한개
+
+
+###############################################################
+##                   자료 정리 (전처리)                      ##
+###############################################################
+
+# 날짜로 타입 변환하기
+str(bg_data$시점)
+bg_data$시점<-as.Date(bg_data$시점)
+str(bg_data$시점)
+
+# 음수값 제거하기
+which(bg_data$부산광역시<0) # 6번째 데이터 파악
+bg_data[7,]
+bg_data<-bg_data[-7,]
+summary(bg_data) 
+
+# 결측값 제거하기
+which(is.na(bg_data$광주광역시)) # 20번째 데이터 파악
+bg_data[20,]
+bg_data<-bg_data[-20,]
+summary(bg_data) 
+
+
+###############################################################
+##             분석 실습 1  (전국 혼인 그래프)             ##
+###############################################################
+
+# 전국의 월별 혼인 패턴 파악하기
+
+# 기본 그래프
+plot(bg_data$시점,bg_data$전국)
+
+# 라인 그래프
+plot(bg_data$시점,bg_data$전국,type="o")
+
+# (옵션 1) 축 이름 생성
+plot(bg_data$시점,bg_data$전국,type="o",xlab ="기준 일자",ylab = "전국의 월별 혼인수")
+
+# (옵션 2) 그래프 제목 생성
+plot(bg_data$시점,bg_data$전국,type="o",xlab ="기준 일자",ylab = "전국의 월별 혼인수", main="전국의 월별 혼인 패턴")
+
+# (옵션 3) 그래프 선 패턴 변경
+plot(bg_data$시점,bg_data$전국,type="o",xlab ="기준 일자",ylab = "전국의 월별 혼인수", main="전국의 월별 혼인 패턴",lty=2)
+
+# (옵션 4) 그래프 선 굵기 변경
+plot(bg_data$시점,bg_data$전국,type="o",xlab ="기준 일자",ylab = "전국의 월별 혼인수", main="전국의 월별 혼인 패턴",lty=2,lwd=3)
+
+# (옵션 5) 그래프 선 색상 변경
+plot(bg_data$시점,bg_data$전국,type="o",xlab ="기준 일자",ylab = "전국의 월별 혼인수", main="전국의 월별 혼인 패턴",lty=2,lwd=3,col="grey")
+
+# (옵션 6) 그래프의 범례 추가
+
+legend("topleft",legend=c("전국 혼인수"),lty=c(2),lwd=c(3),col=c("grey"))
+
+
+###############################################################
+##             분석 실습 2  (전국과 시의 패턴 비교)          ##
+###############################################################
+
+plot(bg_data$시점,bg_data$전국,type="o",xlab ="기준 일자",ylab = "전국의 월별 혼인 비교", yaxt="n" ,main="전국의 월별 혼인 패턴",lty=2,lwd=3,col="grey")
+
+# 서울
+par(new=T) 
+plot(bg_data$시점,bg_data$서울특별시, type="o", col= "blue",axes=FALSE, xlab=" ", ylab=" " ) 
+legend("topleft",legend=c("전국 혼인수", "서울 혼인수"),lty=c(2,1),lwd=c(3,1),col=c("grey","blue"))
+
+
+# 특별시들간의 비교 (1: plot)
+plot(bg_data$시점,bg_data$서울특별시,type="o",xlab ="기준 일자",ylab = "전국의 월별 혼인 비교", yaxt="n" ,main="전국의 월별 혼인 패턴",lty=2,lwd=3,col="grey")
+par(new=T) 
+plot(bg_data$시점,bg_data$부산광역시, type="o", col= "azure",axes=FALSE, xlab=" ", ylab=" " ) 
+par(new=T) 
+plot(bg_data$시점,bg_data$대구광역시, type="o", col= "bisque2",axes=FALSE, xlab=" ", ylab=" " ) 
+par(new=T) 
+plot(bg_data$시점,bg_data$인천광역시, type="o", col= "chartreuse2",axes=FALSE, xlab=" ", ylab=" " ) 
+par(new=T) 
+plot(bg_data$시점,bg_data$광주광역시, type="o", col= "blueviolet",axes=FALSE, xlab=" ", ylab=" " )
+par(new=T) 
+plot(bg_data$시점,bg_data$대전광역시, type="o", col= "darkgoldenrod1",axes=FALSE, xlab=" ", ylab=" " ) 
+par(new=T) 
+plot(bg_data$시점,bg_data$울산광역시, type="o", col= "darkorchid4",axes=FALSE, xlab=" ", ylab=" " ) 
+par(new=T) 
+plot(bg_data$시점,bg_data$세종특별자치시, type="o", col= "gainsboro",axes=FALSE, xlab=" ", ylab=" " ) 
+
+
+# 특별시들간의 비교 (2: box plot)
+boxplot(bg_data$서울특별시,bg_data$부산광역시,bg_data$대구광역시,
+        bg_data$인천광역시,bg_data$광주광역시,bg_data$대전광역시,
+        bg_data$울산광역시,bg_data$세종특별자치시,
+        names=c("서울","부산","대구","인천","광주","대전","울산","세종"),
+        main="전국 및 시의 월별 혼인 패턴 비교")
+
+
+###############################################################
+##             분석 실습 4  (전국 혼인과 타 요인 비교)       ##
+###############################################################
+
+plot(bg_data$시점,bg_data$전국,type="o",xlab ="기준 일자",ylab = "전국의 월별 혼인 비교", yaxt="n" ,main="전국의 월별 혼인 패턴",lty=2,lwd=3,col="grey")
+
+# 이혼수
+plot(bg_data$시점,bg_data$전국,type="o",xlab ="기준 일자",ylab = "전국의 월별 혼인 비교", yaxt="n" ,main="전국의 월별 혼인 패턴",lty=2,lwd=3,col="grey")
+par(new=T) 
+plot(bg_data$시점,bg_data$이혼수, type="o", col= "blue",axes=FALSE, xlab=" ", ylab=" " ) 
+legend("topleft",legend=c("전국 혼인수", "전국 이혼수"),lty=c(2,1),lwd=c(3,1),col=c("grey","blue"))
+
+
+
+
+
+
+
+
+

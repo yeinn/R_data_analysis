@@ -1,0 +1,114 @@
+# 기본 폴더 준비
+setwd("C://Users//Administrator//Desktop//rtest")
+
+# 분석 데이터 불러오기
+ex_data<-read.csv("data_ex.csv")
+
+# 분석 데이터셋 확인
+summary(ex_data)
+str(ex_data)
+
+# 분석 데이터 셋 전처리
+ex_data$A_money<-as.numeric(ex_data$A_money)
+ex_data$time <-as.Date(ex_data$time,origin = "1900-01-01")
+
+#다시 한번 분석 데이터 확인
+str(ex_data)
+
+# 시간의 흐름에 따른 매출 데이터 변화 패턴 
+plot(ex_data$time,ex_data$A_money, type="o", col="blue",xlab=" ", ylab=" ")
+
+# 매출 데이터 매출 데이터 단위 변환 (천원)
+plot(ex_data$time,ex_data$A_money/1000, type="o", col="blue",xlab=" ", ylab=" ")
+
+# 그래프에 옵션 추가
+title(main="월별 매출 패턴", col.main="red", font.main=10)
+title(xlab="Time", col.lab="red")
+title(ylab="매출 데이터", col.lab="red")
+
+# 월별 매출과 영수증 발행 숫자
+
+plot(ex_data$time,ex_data$A_money, type="o", col="blue",xlab=" ", ylab=" ") 
+par(new=T)
+plot(ex_data$time,ex_data$A_bill_count, type="o", col="red", axes=FALSE,xlab=" ", ylab=" " ) 
+
+title(main="월별 매출과 영수증 발행 수의 패턴", col.main="red", font.main=10)
+title(xlab="Time", col.lab="red")
+title(ylab="매출 데이터", col.lab="red")
+
+# 월별 매출과 본선 교통량
+
+plot(ex_data$time,ex_data$A_money, type="o", col="blue",xlab=" ", ylab=" ")
+par(new=T)
+plot(ex_data$time,ex_data$A_traffic , type="o", col="red", axes=FALSE,xlab=" ", ylab=" " ) 
+
+title(main=" 월별 매출과 본선 교통량의 패턴 ", col.main="red", font.main=10)
+title(xlab="Time", col.lab="red")
+title(ylab="매출 데이터", col.lab="red")
+
+# 월별 매출과 휴게소 앞 차량 평균 속도
+
+plot(ex_data$time,ex_data$A_money, type="o", col="blue",xlab=" ", ylab=" ")
+par(new=T)
+plot(ex_data$time,ex_data$A_speed , type="o", col="red", axes=FALSE, xlab=" ", ylab=" " ) 
+
+title(main="월별 매출과 휴게소 앞 평균 속도 패턴", col.main="red", font.main=10)
+title(xlab="Time", col.lab="red")
+title(ylab="매출 데이터", col.lab="red")
+
+# 월별 매출과 기름값
+
+plot(ex_data$time,ex_data$A_money, type="o", col="blue",xlab=" ", ylab=" ")
+par(new=T)
+plot(ex_data$time,ex_data$A_oilprice , type="o", col="red", axes=FALSE, xlab=" ", ylab=" " ) 
+
+title(main="월별 매출과 평균 기름값 패턴 ", col.main="red", font.main=10)
+title(xlab="Time", col.lab="red")
+title(ylab="매출 데이터", col.lab="red")
+
+# 천안 휴게소 패턴 하나의 창에 그리기
+par(mfrow=c(2,2))
+
+# 월별 매출과 영수증 발행 숫자
+plot(ex_data$time,ex_data$B_money/1000, type="o", col="blue",xlab=" ", ylab=" ") 
+par(new=T)
+plot(ex_data$time,ex_data$B_bill_count, type="o", col="red", axes=FALSE, xlab=" ", ylab=" " ) 
+
+title(main="월별 매출과 영수증 발행 수의 패턴", col.main="red", font.main=10)
+title(xlab="Time", col.lab="red")
+title(ylab="매출 데이터", col.lab="red")
+
+# 월별 매출과 본선 교통량
+plot(ex_data$time,ex_data$B_money/1000, type="o", col="blue",xlab=" ", ylab=" ")
+par(new=T)
+plot(ex_data$time,ex_data$B_traffic , type="o", col="red", axes=FALSE, xlab=" ",ylab=" " ) 
+
+title(main=" 월별 매출과 본선 교통량의 패턴 ", col.main="red", font.main=10)
+title(xlab="Time", col.lab="red")
+title(ylab="매출 데이터", col.lab="red")
+
+# 월별 매출과 휴게소앞 차량 평균 속도
+plot(ex_data$time,ex_data$B_money/1000, type="o", col="blue",xlab=" ", ylab=" ")
+par(new=T)
+plot(ex_data$time,ex_data$B_speed , type="o", col="red", axes=FALSE, xlab=" ",ylab=" " ) 
+
+title(main="월별 매출과 휴게소 앞 평균 속도 패턴", col.main="red", font.main=10)
+title(xlab="Time", col.lab="red")
+title(ylab="매출 데이터", col.lab="red")
+
+# 월별 매출과 기름값
+plot(ex_data$time,ex_data$B_money/1000, type="o", col="blue",xlab=" ", ylab=" ")
+par(new=T)
+plot(ex_data$time,ex_data$B_oilprice , type="o", col="red", axes=FALSE, xlab=" ",ylab=" " ) 
+title(main="월별 매출과 평균 기름값 패턴", col.main="red", font.main=10)
+title(xlab="Time", col.lab="red")
+title(ylab="매출 데이터", col.lab="red")
+
+# 문막 휴게소 vs 천안 휴게소
+plot(ex_data$time,ex_data$A_money/1000, type="o", col="blue",xlab=" ", ylab=" ", ylim= c(0,2000000))
+par(new=T)
+plot(ex_data$time,ex_data$B_money/1000, type="o", col="red",axes=FALSE, xlab=" ",ylab=" ")
+
+title(main="천안과 문막 휴게소의 월별 매출 패턴", col.main="red", font.main=10)
+title(xlab="Time", col.lab="red")
+title(ylab="매출 데이터", col.lab="red")
